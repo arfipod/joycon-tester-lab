@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Joy-Con WebHID Haptics POC</title>
+    <meta
+      name="description"
+      content="Experimental WebHID proof of concept for official Nintendo Switch Joy-Con detection and alternating haptic pulses."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">Experimental hardware proof of concept</p>
+        <h1>Joy-Con WebHID Haptics POC</h1>
+        <p class="lead">
+          Test whether official Nintendo Switch Joy-Con L/R controllers can be detected and pulsed from Chrome or Edge through WebHID.
+        </p>
+      </header>
+
+      <section class="warning" aria-label="Safety warning">
+        <strong>Important:</strong> this is not the production Open Bistimulation app, not medical software, and not a therapy tool.
+        It is only a browser hardware experiment. Keep the controllers on a table for the first test and press Stop immediately if behavior is unexpected.
+      </section>
+
+      <section class="card grid two">
+        <div>
+          <h2>Environment</h2>
+          <dl class="status-list">
+            <div><dt>Secure context</dt><dd id="secureContextStatus">Checking…</dd></div>
+            <div><dt>WebHID</dt><dd id="webHidStatus">Checking…</dd></div>
+            <div><dt>User agent</dt><dd id="userAgentStatus">Checking…</dd></div>
+          </dl>
+        </div>
+        <div>
+          <h2>Expected official IDs</h2>
+          <ul class="compact-list">
+            <li><code>vendorId 0x057e</code>: Nintendo</li>
+            <li><code>productId 0x2006</code>: Joy-Con Left</li>
+            <li><code>productId 0x2007</code>: Joy-Con Right</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>1. Connect devices</h2>
+        <div class="button-row">
+          <button id="connectBtn" type="button">Connect official Joy-Con</button>
+          <button id="listBtn" type="button" class="secondary">List known devices</button>
+          <button id="forgetBtn" type="button" class="secondary">Forget selected permissions</button>
+          <button id="disconnectBtn" type="button" class="danger secondary">Disconnect all</button>
+        </div>
+        <p class="hint">
+          Pair both Joy-Con with your computer first. In the browser prompt, select the left and right Joy-Con one by one if necessary.
+        </p>
+      </section>
+
+      <section class="card grid two">
+        <div>
+          <h2>Detected left</h2>
+          <pre id="leftDeviceBox" class="device-box">No left Joy-Con detected yet.</pre>
+        </div>
+        <div>
+          <h2>Detected right</h2>
+          <pre id="rightDeviceBox" class="device-box">No right Joy-Con detected yet.</pre>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>2. Haptic test controls</h2>
+        <div class="controls-grid">
+          <label>
+            Interval between sides (ms)
+            <input id="intervalMs" type="number" value="500" min="100" step="50" />
+          </label>
+          <label>
+            Pulse duration (ms)
+            <input id="pulseMs" type="number" value="120" min="20" max="1000" step="10" />
+          </label>
+          <label>
+            Intensity profile
+            <select id="intensity">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </label>
+          <label>
+            Alternating cycles
+            <input id="cycleLimit" type="number" value="20" min="1" max="240" step="1" />
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button id="enableVibrationBtn" type="button" class="secondary">Enable vibration</button>
+          <button id="testLeftBtn" type="button">Test Left</button>
+          <button id="testRightBtn" type="button">Test Right</button>
+          <button id="testBothBtn" type="button" class="secondary">Test Both</button>
+          <button id="alternateBtn" type="button">Start alternating</button>
+          <button id="stopBtn" type="button" class="danger">Stop</button>
+        </div>
+
+        <p class="hint">
+          If detection works but rumble does not, capture the log. The packet implementation may need adjustment for your OS/browser/device path.
+        </p>
+      </section>
+
+      <section class="card">
+        <div class="log-header">
+          <h2>Log</h2>
+          <div class="button-row small">
+            <button id="copyLogBtn" type="button" class="secondary">Copy log</button>
+            <button id="clearLogBtn" type="button" class="secondary">Clear</button>
+          </div>
+        </div>
+        <pre id="log" class="log" aria-live="polite"></pre>
+      </section>
+    </main>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

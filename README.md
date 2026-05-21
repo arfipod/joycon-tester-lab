@@ -7,134 +7,164 @@ This project is intentionally isolated from Open Bistimulation. It is not medica
 ## What this tests
 
 - Whether WebHID is available in the browser.
-- Whether official Nintendo Joy-Con controllers can be detected.
-- Whether the left and right Joy-Con can be classified independently.
-- Whether experimental rumble output reports can trigger haptic feedback.
-- Whether alternating left/right pulses are stable enough to consider later integration.
+- Whether official Nintendo Joy-Con controllers are visible to the browser.
+- Whether left/right can be identified using known official Nintendo IDs:
+  - `vendorId 0x057e`: Nintendo
+  - `productId 0x2006`: Joy-Con Left
+  - `productId 0x2007`: Joy-Con Right
+- Whether vibration can be enabled and triggered through HID output reports.
+- Whether a basic left/right alternating pulse loop is stable enough for further investigation.
 
-## Expected official Joy-Con IDs
+## What this does not guarantee
 
-The POC prioritizes the documented Nintendo HID identifiers:
+- It does not guarantee support in all browsers.
+- It does not guarantee support in all operating systems.
+- It does not guarantee support for clone Joy-Con controllers.
+- It does not validate any therapeutic, medical, clinical, or safety outcome.
+- It does not integrate with Open Bistimulation sessions yet.
 
-| Device | Vendor ID | Product ID |
-|---|---:|---:|
-| Nintendo | `0x057e` | - |
-| Joy-Con Left | `0x057e` | `0x2006` |
-| Joy-Con Right | `0x057e` | `0x2007` |
+## Recommended environment
 
-If your Joy-Con appear with different IDs, copy the log and inspect it before assuming failure.
+Use:
 
-## Browser requirements
+- Chrome or Edge desktop.
+- HTTPS deployment or localhost.
+- Official Nintendo Switch Joy-Con controllers, paired separately over Bluetooth.
 
-Use a desktop Chromium browser:
-
-- Google Chrome desktop
-- Microsoft Edge desktop
-
-WebHID is not universally available. Safari and Firefox are not expected to work for this POC.
-
-The page must run in a secure context. `localhost` and HTTPS deployments such as Vercel are valid secure contexts.
+Avoid testing first with clone controllers. If a clone fails, it is unclear whether the failure is caused by the browser, OS, WebHID, HID output reports, or the clone's protocol.
 
 ## Local run
 
 ```sh
 npm install
-npm run dev
+npm run build
+npm run preview
 ```
 
-Open:
+Then open:
 
-```text
+```txt
+http://localhost:4173
+```
+
+For quick static serving without building:
+
+```sh
+npx serve public -l 5173
+```
+
+Then open:
+
+```txt
 http://localhost:5173
 ```
 
-## Build
+`localhost` is considered a secure context by browsers, which is required for WebHID.
+
+## Vercel deployment
+
+This is a static project. Vercel should run:
 
 ```sh
 npm run build
 ```
 
-The static output is generated in:
+The configured output directory is:
 
-```text
-dist/
+```txt
+dist
 ```
 
-## Deploy to Vercel
+The project includes `vercel.json` with:
 
-This project is static. Vercel should use:
-
-```text
-Build Command: npm run build
-Output Directory: dist
-Install Command: npm install
+```json
+{
+  "outputDirectory": "dist"
+}
 ```
 
-`vercel.json` already sets the output directory to `dist` and adds a `Permissions-Policy` header for HID.
+After deployment, open the Vercel HTTPS URL in Chrome or Edge desktop.
 
-## Pairing procedure
+## Test procedure
 
-1. Disconnect both Joy-Con from the Nintendo Switch.
-2. Put each Joy-Con in pairing mode.
-3. Pair them with your PC over Bluetooth.
-4. Open this page in Chrome or Edge desktop.
-5. Click **Connect Joy-Con**.
-6. Select the Joy-Con devices from the browser permission dialog.
-7. Check the visible log.
-8. Run **Test Left** and **Test Right**.
-9. Run **Start alternating** for 30-60 seconds.
-10. Press **Stop** and confirm vibration stops immediately.
-
-## Success criteria
-
-The POC is considered useful only if all of these are true:
-
-- Both Joy-Con appear in the log.
-- Left is classified as `left`.
-- Right is classified as `right`.
-- `Test Left` only affects the left Joy-Con.
-- `Test Right` only affects the right Joy-Con.
-- Alternating mode runs for at least 60 seconds without obvious dropouts.
-- Stop cuts active haptic output immediately.
-- Disconnecting a Joy-Con does not crash the page.
-
-## Known limitations
-
-- This is experimental browser hardware code.
-- Joy-Con HD Rumble output reports are device-specific.
-- Browser, OS and Bluetooth adapter behavior may differ.
-- Generic Gamepad API rumble is intentionally not used here because it does not provide reliable physical left/right Joy-Con separation.
-- The current rumble payload is a conservative experimental implementation and may need adjustment after inspecting real logs.
+1. Pair the left and right Joy-Con with your computer through Bluetooth settings.
+2. Open the POC in Chrome or Edge.
+3. Confirm the page says:
+   - Secure context: yes
+   - WebHID: available
+4. Click **Connect official Joy-Con**.
+5. Select one or both Joy-Con in the browser picker.
+6. If only one appears, repeat the connect action for the other controller.
+7. Confirm the device boxes show:
+   - Left: `vendorId 0x057e`, `productId 0x2006`
+   - Right: `vendorId 0x057e`, `productId 0x2007`
+8. Click **Enable vibration**.
+9. Put both Joy-Con on a table.
+10. Click **Test Left**.
+11. Click **Test Right**.
+12. Click **Start alternating**.
+13. Click **Stop** and verify that vibration stops immediately.
 
 ## Troubleshooting
 
 ### WebHID unavailable
 
-Use Chrome or Edge desktop. Confirm the page is loaded from `localhost` or HTTPS.
+Use Chrome or Edge desktop. Safari and Firefox should not be treated as target browsers for this POC.
+
+### Page is not a secure context
+
+Use HTTPS or localhost. Do not open `index.html` directly via `file://`.
 
 ### Joy-Con do not appear
 
-- Re-pair the Joy-Con with the operating system.
-- Ensure they are disconnected from the Nintendo Switch.
-- Restart Bluetooth.
-- Reload the page and click **Connect Joy-Con** again.
+Try:
 
-### Joy-Con appear but are not classified
+- Re-pairing the Joy-Con in OS Bluetooth settings.
+- Turning Bluetooth off/on.
+- Pressing the small sync button on each Joy-Con.
+- Testing with only one Joy-Con connected first.
+- Opening `chrome://device-log` to inspect HID-related events.
 
-Copy the log. Check `productName`, `vendorId`, and `productId`.
+### Detection works but vibration does not
 
-### Detection works but rumble does not
+Copy the log and inspect:
 
-This means WebHID access is working, but the output report payload probably needs adjustment. Keep the log and test on the same browser/OS while iterating the rumble packet implementation.
+- `productName`
+- `vendorId`
+- `productId`
+- output report IDs
+- error messages from `sendReport()`
 
-### Vibration gets stuck
+The rumble packets are isolated in `public/main.js`:
 
-Press **Stop**, then **Disconnect all**. The page also tries to stop output when the tab becomes hidden or devices disconnect.
+```js
+RUMBLE_PROFILES
+buildRumblePayload()
+enableVibration()
+pulseDevice()
+```
 
-## Safety note
+Adjust those first if the controller detects correctly but does not vibrate.
 
-Use short pulses and low intensity first. Stop immediately if the controller behaves unexpectedly, disconnects repeatedly, heats up, or continues vibrating after pressing stop.
+### Linux permission issue
 
-## License
+On Linux, HID devices may require a udev rule for vendor `057e`. Chrome's WebHID documentation notes that some Linux systems map HID devices with read-only permissions by default.
 
-MIT.
+## Files
+
+```txt
+public/index.html
+public/styles.css
+public/main.js
+scripts/build.mjs
+vercel.json
+package.json
+README.md
+```
+
+## Safety notes
+
+- Keep controllers away from fragile surfaces during tests.
+- Use short pulses first.
+- Stop immediately if vibration is continuous or unexpected.
+- Do not use this as a medical or therapeutic tool.
