@@ -20,8 +20,6 @@ This project is intentionally isolated from Open Bistimulation. It is not medica
 - It does not guarantee support in all browsers.
 - It does not guarantee support in all operating systems.
 - It does not guarantee support for clone Joy-Con controllers.
-- It does not validate any therapeutic, medical, clinical, or safety outcome.
-- It does not integrate with Open Bistimulation sessions yet.
 
 ## Recommended environment
 
@@ -165,6 +163,3 @@ README.md
 ## Safety notes
 
 - Keep controllers away from fragile surfaces during tests.
-- Use short pulses first.
-- Stop immediately if vibration is continuous or unexpected.
-- Do not use this as a medical or therapeutic tool.
