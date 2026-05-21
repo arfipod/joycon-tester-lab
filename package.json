@@ -3,11 +3,14 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Experimental WebHID proof of concept for official Nintendo Switch Joy-Con detection and alternating haptic pulses.",
+  "description": "Local Joy-Con HID vibration tester.",
   "scripts": {
-    "dev": "npx serve public -l 5173",
-    "build": "node scripts/build.mjs",
-    "preview": "npx serve dist -l 4173"
+    "dev": "node scripts/local-app.mjs",
+    "joycon:list": "node scripts/joycon-rumble.mjs list",
+    "joycon:left": "node scripts/joycon-rumble.mjs pulse --side left --intensity high --duration 900 --repeats 2",
+    "joycon:right": "node scripts/joycon-rumble.mjs pulse --side right --intensity high --duration 900 --repeats 2",
+    "joycon:both": "node scripts/joycon-rumble.mjs pulse --side both --intensity high --duration 700 --repeats 1",
+    "joycon:pulse": "node scripts/joycon-rumble.mjs pulse"
   },
   "engines": {
     "node": ">=20 <23",
@@ -15,11 +18,13 @@
   },
   "packageManager": "npm@10.9.2",
   "keywords": [
-    "webhid",
+    "hid",
     "joy-con",
     "nintendo-switch",
-    "haptics",
-    "proof-of-concept"
+    "haptics"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "node-hid": "^3.3.0"
+  }
 }
