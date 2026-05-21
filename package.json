@@ -1,0 +1,25 @@
+{
+  "name": "joycon-webhid-poc",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Experimental WebHID proof of concept for official Nintendo Switch Joy-Con detection and alternating haptic pulses.",
+  "scripts": {
+    "dev": "npx serve public -l 5173",
+    "build": "node scripts/build.mjs",
+    "preview": "npx serve dist -l 4173"
+  },
+  "engines": {
+    "node": ">=20 <23",
+    "npm": ">=10"
+  },
+  "packageManager": "npm@10.9.2",
+  "keywords": [
+    "webhid",
+    "joy-con",
+    "nintendo-switch",
+    "haptics",
+    "poc"
+  ],
+  "license": "MIT"
+}
