@@ -2,8 +2,6 @@
 
 Experimental browser proof of concept for testing whether official Nintendo Switch Joy-Con L/R controllers can be detected and pulsed from Chrome or Edge through WebHID.
 
-This project is intentionally isolated from Open Bistimulation. It is not medical software, not a therapy tool, and not intended for clinical use. It only tests browser/hardware behavior.
-
 ## What this tests
 
 - Whether WebHID is available in the browser.
